@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, Notification, ipcMain, session, dialog } = require('electron');
+const { app, BrowserWindow, Tray, Menu, Notification, ipcMain, session, dialog, shell } = require('electron');
 const Store = require('electron-store');
 const path = require('path');
 
@@ -7,6 +7,118 @@ let mainWindow;
 let tray;
 let notifiedEmails = new Set();
 let userSession;
+
+const releaseApiUrl = 'https://api.github.com/repos/nuno-miranda/saltix/releases/latest';
+
+function normalizeVersion(version) {
+  return String(version || '').trim().replace(/^v/i, '');
+}
+
+function parseSemver(version) {
+  return normalizeVersion(version)
+    .split('.')
+    .map((segment) => Number.parseInt(segment, 10) || 0);
+}
+
+function compareVersions(a, b) {
+  const aParts = parseSemver(a);
+  const bParts = parseSemver(b);
+  const length = Math.max(aParts.length, bParts.length);
+
+  for (let i = 0; i < length; i += 1) {
+    const aNum = aParts[i] || 0;
+    const bNum = bParts[i] || 0;
+    if (aNum > bNum) return 1;
+    if (aNum < bNum) return -1;
+  }
+
+  return 0;
+}
+
+function showUpdateDialog(release) {
+  if (!mainWindow) return;
+
+  if (release) {
+    dialog.showMessageBox(mainWindow, {
+      type: 'info',
+      title: 'Update Available',
+      message: `A new SALTIX version is available (${release.tag_name}).`,
+      detail: `Your current version is ${app.getVersion()}.
+
+Release notes:
+${release.body || 'No description available.'}`,
+      buttons: ['Open Release', 'Close'],
+      cancelId: 1
+    }).then((result) => {
+      if (result.response === 0) {
+        shell.openExternal(release.html_url);
+      }
+    });
+  } else {
+    dialog.showMessageBox(mainWindow, {
+      type: 'info',
+      title: 'Up to Date',
+      message: `You are running the latest SALTIX version (${app.getVersion()}).`,
+      buttons: ['Close']
+    });
+  }
+}
+
+function checkForUpdates(showDialog = false) {
+  return new Promise((resolve, reject) => {
+    const https = require('https');
+
+    const request = https.get(releaseApiUrl, {
+      headers: {
+        'User-Agent': 'SALTIX-Update-Checker'
+      }
+    }, (response) => {
+      let body = '';
+
+      response.on('data', (chunk) => {
+        body += chunk;
+      });
+
+      response.on('end', () => {
+        if (response.statusCode !== 200) {
+          const error = new Error(`GitHub API returned ${response.statusCode}`);
+          if (showDialog) {
+            dialog.showErrorBox('Update Check Failed', error.message);
+          }
+          reject(error);
+          return;
+        }
+
+        try {
+          const release = JSON.parse(body);
+          const latestTag = normalizeVersion(release.tag_name || release.name || '');
+          const currentVersion = app.getVersion();
+
+          if (compareVersions(latestTag, currentVersion) > 0) {
+            if (showDialog) showUpdateDialog(release);
+            resolve(release);
+            return;
+          }
+
+          if (showDialog) showUpdateDialog(null);
+          resolve(null);
+        } catch (error) {
+          if (showDialog) {
+            dialog.showErrorBox('Update Check Failed', error.message);
+          }
+          reject(error);
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      if (showDialog) {
+        dialog.showErrorBox('Update Check Failed', error.message);
+      }
+      reject(error);
+    });
+  });
+}
 
 // Initialize notifications enabled
 if (store.get('notificationsEnabled') === undefined) {
@@ -30,6 +142,19 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 
   const menuTemplate = [
+    {
+      label: `SALTIX v${app.getVersion()}`,
+      submenu: [
+        {
+          label: 'Check for Updates',
+          click: () => checkForUpdates(true)
+        },
+        {
+          label: `Version ${app.getVersion()}`,
+          enabled: false
+        }
+      ]
+    },
     {
       label: 'Help',
       submenu: [
@@ -175,6 +300,11 @@ app.whenReady().then(() => {
   userSession = session.fromPartition('persist:sapo-mail');
   createWindow();
   // createTray();
+  checkForUpdates().then((release) => {
+    if (release) showUpdateDialog(release);
+  }).catch((error) => {
+    console.error('[Update Check] Failed:', error);
+  });
 });
 
 app.on('window-all-closed', () => {

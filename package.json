@@ -1,7 +1,7 @@
 {
   "name": "saltix",
   "productName": "SALTIX",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "Open source SAPO Mail desktop app for Linux and Windows",
   "main": "main.js",
   "author": "Nuno Miranda",
