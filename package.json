@@ -1,38 +1,68 @@
 {
-  "name": "sapo-mail-app",
-  "version": "1.0.0",
-  "description": "SAPO Mail Desktop App",
+  "name": "saltix",
+  "productName": "SALTIX",
+  "version": "0.0.1",
+  "description": "Open source SAPO Mail desktop app for Linux and Windows",
   "main": "main.js",
+  "author": "Nuno Miranda",
+  "license": "MIT",
+
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
     "dist": "electron-builder --publish=never"
   },
+
   "devDependencies": {
     "electron": "^38.0.0",
     "electron-builder": "^26.8.1"
   },
+
   "dependencies": {
     "electron-store": "^8.2.0"
   },
+
   "build": {
-    "appId": "com.vodrius.mailapp",
-    "productName": "SALTIX – Cliente para o Email SAPO.PT",
+    "appId": "com.nunomiranda.saltix",
+    "artifactName": "${productName}-${version}-${os}.${ext}",
+
     "directories": {
       "output": "dist"
     },
+
     "files": [
-      "**/*",
-      "!dist/**/*"
+      "main.js",
+      "package.json",
+      "assets/**/*",
+      "node_modules/**/*"
     ],
+
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Network",
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "executableName": "saltix"
     },
+
     "win": {
-      "target": "nsis",
+      "target": [
+        "nsis"
+      ],
       "icon": "assets/icon.ico"
-    }
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
   }
 }
