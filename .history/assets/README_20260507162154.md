@@ -1,0 +1,1 @@
+Add a tray.png icon here (16x16 or 32x32 PNG).
