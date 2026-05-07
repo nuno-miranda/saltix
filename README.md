@@ -187,3 +187,10 @@ Nuno Miranda
 GitHub:
 
 [nuno-miranda GitHub](https://github.com/nuno-miranda?utm_source=chatgpt.com)
+
+# Support the Project
+
+If SALTIX helps you and you would like to support development,
+you can buy me a coffee:
+
+[Buy Me a Coffee](https://buymeacoffee.com/vodrius)
