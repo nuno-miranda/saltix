@@ -46,6 +46,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: npm run build -- --linux AppImage
 
+      - name: Ensure AppImage is executable
+        if: matrix.os == 'ubuntu-latest'
+        run: chmod +x dist/*.AppImage
+
       # Upload artifacts for later release job
       - name: Upload Windows artifact
         if: matrix.os == 'windows-latest'
