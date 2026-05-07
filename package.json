@@ -1,7 +1,7 @@
 {
   "name": "saltix",
   "productName": "SALTIX",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Open source SAPO Mail desktop app for Linux and Windows",
   "main": "main.js",
   "author": {
@@ -29,11 +29,12 @@
       "output": "dist"
     },
     "files": [
-      "main.js",
-      "update-checker.js",
-      "package.json",
-      "assets/**/*",
-      "node_modules/**/*"
+      "**/*",
+      "!dist/**/*",
+      "!.git/**/*",
+      "!.history/**/*",
+      "!node_modules/.cache/**/*",
+      "!**/*.log"
     ],
     "linux": {
       "target": [
