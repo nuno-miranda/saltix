@@ -8,6 +8,7 @@ let mainWindow;
 let tray;
 let notifiedEmails = new Set();
 let userSession;
+let refreshInterval;
 
 // Initialize notifications enabled
 if (store.get('notificationsEnabled') === undefined) {
@@ -82,8 +83,7 @@ function createWindow() {
     }
   });
 
-  // Auto refresh disabled - browser already updates via JSON API
-  // startAutoRefresh();
+  startAutoRefresh();
 }
 
 async function handleCheckForUpdates() {
@@ -143,28 +143,35 @@ function createTray() {
   // tray.on('click', () => mainWindow.show());
 }
 
-// Auto refresh disabled - browser already updates via JSON API
-// function startAutoRefresh() {
-//   refreshInterval = setInterval(() => {
-//     if (mainWindow && !mainWindow.isDestroyed()) {
-//       mainWindow.webContents.executeJavaScript(`
-//         (function() {
-//           const webviewEl = document.getElementById('mail-webview');
-//           if (webviewEl) {
-//             webviewEl.executeJavaScript(\`
-//               const refreshBtn = document.querySelector('.messages.actions.refresh');
-//               if (refreshBtn) {
-//                 refreshBtn.click();
-//               } else {
-//                 location.reload();
-//               }
-//             \`);
-//           }
-//         })();
-//       `);
-//     }
-//   }, 60000); // 60 seconds
-// }
+// Auto refresh - refresh email page each minute
+function startAutoRefresh() {
+  refreshInterval = setInterval(() => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.executeJavaScript(`
+        (function() {
+          const webviewEl = document.getElementById('mail-webview');
+          if (webviewEl) {
+            webviewEl.executeJavaScript(\`
+              function clickRefreshButton() {
+                const button = document.querySelector(
+                  'span.button[aria-label="Atualizar mensagens"]'
+                );
+
+                if (button) {
+                  button.click();
+                  console.log('Refresh button clicked.');
+                } else {
+                  console.log('Refresh button not found.');
+                }
+              }
+              clickRefreshButton();
+            \`);
+          }
+        })();
+      `);
+    }
+  }, 60000); // 60 seconds
+}
 
 function showNotification(sender, subject) {
   // Defensive check - ensure we're really checking if notifications are enabled
