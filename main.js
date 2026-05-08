@@ -11,7 +11,7 @@ let userSession;
 
 // Initialize notifications enabled
 if (store.get('notificationsEnabled') === undefined) {
-    store.set('notificationsEnabled', true);
+  store.set('notificationsEnabled', true);
 }
 
 function createWindow() {
@@ -25,8 +25,14 @@ function createWindow() {
       webSecurity: true,
       webviewTag: true
     },
-    icon: path.join(__dirname, 'assets', 'icon.png') // Assuming tray.png is the app icon
+    icon: path.join(__dirname, 'assets', 'icon.png')
   });
+
+  // Remove Electron from User-Agent
+  const defaultUA = mainWindow.webContents.getUserAgent();
+  const cleanUA = defaultUA.replace(/ Electron\/[\d.]+/, '');
+
+  mainWindow.webContents.setUserAgent(cleanUA);
 
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 
@@ -64,6 +70,7 @@ function createWindow() {
       ]
     }
   ];
+
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
 
@@ -163,12 +170,12 @@ function showNotification(sender, subject) {
   // Defensive check - ensure we're really checking if notifications are enabled
   const notificationsEnabled = store.get('notificationsEnabled');
   console.log('[Notification] Enabled:', notificationsEnabled, 'Sender:', sender);
-  
+
   if (notificationsEnabled === false) {
     console.log('[Notification] Blocked - notifications disabled');
     return;
   }
-  
+
   // Only show if explicitly enabled
   if (notificationsEnabled !== true) {
     console.log('[Notification] Blocked - notifications not enabled');

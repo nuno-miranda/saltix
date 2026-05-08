@@ -48,7 +48,7 @@ if (webview) {
           });
         });
 
-        const messagesList = document.querySelector('.container.messages-list');
+        const messagesList = document.querySelector('#element-list-messages');
         if (messagesList) {
           observer.observe(messagesList, { childList: true, subtree: true });
         }
