@@ -31,6 +31,12 @@ Available packages:
 * Linux `.AppImage`
 * Linux `.deb`
 
+Current release:
+
+```text
+v1.0.0
+```
+
 ---
 
 # Linux Installation
@@ -44,13 +50,13 @@ Some Linux desktop environments do not automatically mark AppImages as executabl
 If double-clicking the AppImage opens it as an archive or disk image instead of launching the app, run:
 
 ```bash
-chmod +x SALTIX-x.x.x-linux.AppImage
+chmod +x SALTIX-1.0.0-linux.AppImage
 ```
 
 Then launch it with:
 
 ```bash
-./SALTIX-x.x.x-linux.AppImage
+./SALTIX-1.0.0-linux.AppImage
 ```
 
 ---
@@ -60,7 +66,7 @@ Then launch it with:
 Install using:
 
 ```bash
-sudo dpkg -i SALTIX-x.x.x-linux.deb
+sudo dpkg -i SALTIX-1.0.0-linux.deb
 ```
 
 If dependencies are missing:
@@ -124,8 +130,6 @@ SALTIX uses GitHub Actions for automated builds and releases.
 Every semantic version tag:
 
 ```text
-v0.0.7
-v0.1.0
 v1.0.0
 ```
 
@@ -148,8 +152,6 @@ MAJOR.MINOR.PATCH
 
 Examples:
 
-* `0.0.7`
-* `0.1.0`
 * `1.0.0`
 
 ---
