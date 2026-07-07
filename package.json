@@ -5,8 +5,7 @@
   "description": "Open source SAPO Mail desktop app for Linux and Windows",
   "main": "main.js",
   "author": {
-    "name": "Nuno Miranda",
-    "email": "38939683+nuno-miranda@users.noreply.github.com"
+    "name": "Nuno Miranda"
   },
   "license": "MIT",
   "scripts": {
